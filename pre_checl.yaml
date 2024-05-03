@@ -5,7 +5,7 @@
  tasks:
    - name: Check GitLab
      uri:
-       url: http://github.com
+       url: https://github.com/bhavanaguda
        method: GET
      register: gitlab_check
      ignore_errors: yes
@@ -15,13 +15,13 @@
      ignore_errors: yes
    - name: Check SonarQube
      uri:
-       url: http://sonarqube.example.com
+       url: http://10.138.77.104:9000
        method: GET
      register: sonarqube_check
      ignore_errors: yes
    - name: Check Docker Registry
      uri:
-       url: http://dockerregistry.example.com
+       url: https://hub.docker.com/u/bhavanaguda
        method: GET
      register: docker_registry_check
      ignore_errors: yes
