@@ -27,6 +27,8 @@
       ignore_errors: yes
     - name: Check Kubernetes
       command: kubectl version
+      environment:
+        KUBECONFIG: "/opt/gitlab/embedded/service/gitlab-rails/lib/gitlab/kubernetes/kubeconfig"
       register: kubernetes_check
       ignore_errors: yes
     - name: Print Results
