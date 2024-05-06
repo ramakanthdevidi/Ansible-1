@@ -5,7 +5,7 @@
   tasks:
     - name: Check GitLab
       uri:
-url: https://github.com/bhavanaguda/Ansible/
+uri: https://github.com/bhavanaguda/Ansible
         method: GET
       register: gitlab_check
       ignore_errors: yes
@@ -17,14 +17,14 @@ url: https://github.com/bhavanaguda/Ansible/
  
     - name: Check SonarQube
       uri:
-url: http://10.138.77.104:9000
+uri: http://10.138.77.104:9000
         method: GET
       register: sonarqube_check
       ignore_errors: yes
  
     - name: Check Docker Registry
       uri:
-url: https://hub.docker.com/u/bhavanaguda
+uri: https://hub.docker.com/u/bhavanaguda
         method: GET
       register: docker_registry_check
       ignore_errors: yes
