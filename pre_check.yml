@@ -1,6 +1,6 @@
 ---
 - name: Pre-Checks for CI/CD Pipeline
-hosts: webserver
+hosts: localhost
 gather_facts: no
 tasks:
    - name: Check GitLab
