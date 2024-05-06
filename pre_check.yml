@@ -1,6 +1,6 @@
 ---
 - name: Pre-Checks for CI/CD Pipeline
-  hosts: http://10.138.77.104:8082
+  hosts: localhost
   gather_facts: no
   tasks:
     - name: Check GitLab
