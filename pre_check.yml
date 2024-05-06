@@ -5,7 +5,7 @@
   tasks:
     - name: Check GitLab
       uri:
-url: https://github.com/bhavanaguda
+url: https://github.com/bhavanaguda/Ansible/
         method: GET
       register: gitlab_check
       ignore_errors: yes
