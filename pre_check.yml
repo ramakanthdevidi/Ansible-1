@@ -1,15 +1,9 @@
 ---
 - name: Pre-Checks for CI/CD Pipeline
- hosts: webserver
- remote_user: root
- become: yes
- become_user: wangwu
- gather_facts: no
- tasks:
+hosts: webserver
+gather_facts: no
+tasks:
    - name: Check GitLab
-     copy: 
-       src: /etc/fstab
-       dest: /home/wangwu/fstab.bak
      uri:
        url: https://github.com/bhavanaguda
        method: GET
@@ -43,4 +37,3 @@
          SonarQube: {{ 'OK' if sonarqube_check.status == 200 else 'Not Reachable' }}
          Docker Registry: {{ 'OK' if docker_registry_check.status == 200 else 'Not Reachable' }}
          Kubernetes: {{ 'OK' if kubernetes_check.rc == 0 else 'Not Installed' }}
-
