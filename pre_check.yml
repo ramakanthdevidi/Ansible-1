@@ -1,9 +1,15 @@
 ---
 - name: Pre-Checks for CI/CD Pipeline
- hosts: localhost
+ hosts: webserver
+ remote_user: root
+ become: yes
+ become_user: wangwu
  gather_facts: no
  tasks:
    - name: Check GitLab
+     copy: 
+       src: /etc/fstab
+       dest: /home/wangwu/fstab.bak
      uri:
        url: https://github.com/bhavanaguda
        method: GET
