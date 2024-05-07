@@ -22,7 +22,7 @@
         status_code: 200
       register: docker_registry_status
     - name: Check if Kubernetes is reachable
-      command: kubectl cluster-info
+      command: kubectl cluster-info dump
       register: kubernetes_status
       ignore_errors: yes
     - name: Display pre-checks results
