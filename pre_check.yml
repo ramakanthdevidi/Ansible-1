@@ -1,45 +1,38 @@
 ---
-- name: Pre-Checks for CI/CD Pipeline
+- name: CI/CD Pre-Checks
   hosts: localhost
-  gather_facts: no
   tasks:
     - name: Check GitLab
-      uri:
-        url: https://github.com/bhavanaguda
-        method: GET
-      register: gitlab_check
+      uri: null
+      url: https://github.com/bhavanaguda
+      status_code: 200
+      register: gitlab_response
       ignore_errors: yes
     - name: Check Maven
       shell: mvn --version
-      register: maven_check
+      register: maven_response
       ignore_errors: yes
     - name: Check SonarQube
       uri:
         url: http://10.138.77.104:9000
-        method: GET
-      register: sonarqube_check
+        status_code: 200
+      register: sonarqube_response
       ignore_errors: yes
     - name: Check Docker Registry
       uri:
         url: https://hub.docker.com/u/bhavanaguda
-        method: GET
-      register: docker_registry_check
+        status_code: 200
+      register: docker_registry_response
       ignore_errors: yes
     - name: Check Kubernetes
-      command: kubectl version
-      environment:
-        KUBECONFIG: "/opt/gitlab/embedded/service/gitlab-rails/lib/gitlab/kubernetes/kubeconfig"
-      register: kubernetes_check
+      shell: kubectl cluster-info
+      register: kubernetes_response
       ignore_errors: yes
-    - name: Print Results
+    - name: Display Results
       debug:
-        msg: >
-          GitLab: {{ 'OK' if gitlab_check.status == 200 else 'Not Reachable' }}
-
-          Maven: {{ 'OK' if maven_check.rc == 0 else 'Not Installed' }}
-
-          SonarQube: {{ 'OK' if sonarqube_check.status == 200 else 'Not Reachable' }}
-
-          Docker Registry: {{ 'OK' if docker_registry_check.status == 200 else 'Not Reachable' }}
-
-          Kubernetes: {{ 'OK' if kubernetes_check.rc == 0 else 'Not Installed' }}
+        msg: |
+          GitLab: {{ gitlab_response.status }}
+          Maven: {{ maven_response.rc }}
+          SonarQube: {{ sonarqube_response.status }}
+          Docker Registry: {{ docker_registry_response.status }}
+          Kubernetes: {{ kubernetes_response.rc }}
