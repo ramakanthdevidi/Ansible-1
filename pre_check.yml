@@ -24,6 +24,13 @@
         status_code: 200
       register: docker_registry_response
       ignore_errors: yes
+    - name: Check Kubernetes API Server health
+      uri:
+        url: https://your-kubernetes-api-server/apis/metrics.k8s.io/v1beta1/nodes
+        status_code: 200
+        validate_certs: no
+      register: kubernetes_api_health
+      
     - name: Check Kubernetes node status
       shell: kubectl get nodes
       register: kubernetes_node_status
