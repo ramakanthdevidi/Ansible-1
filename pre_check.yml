@@ -24,10 +24,10 @@
         status_code: 200
       register: docker_registry_response
       ignore_errors: yes
-    - name: Check Kubernetes nodes status
+    - name: Check Kubernetes node status
       shell: kubectl get nodes
       register: kubernetes_node_status
-      ignore_errors: true
+      ignore_errors: yes
     - name: Display Results
       debug:
         msg: |
