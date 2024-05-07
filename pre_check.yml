@@ -13,7 +13,7 @@
       ignore_errors: yes
     - name: Check if SonarQube is reachable
       uri:
-        url: http://10.138.77.104:9000
+        url: http://10.138.77.106:9000
         status_code: 200
       register: sonarqube_status
     - name: Check if Docker Registry is reachable
