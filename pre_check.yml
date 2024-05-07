@@ -22,23 +22,14 @@
         status_code: 200
       register: docker_registry_status
     - name: Check if Kubernetes is reachable
-      command: kubectl cluster-info dump
+      command: kubectl --insecure-skip-tls-verify cluster-info dump
       register: kubernetes_status
       ignore_errors: yes
     - name: Display pre-checks results
       debug:
         msg: >
-          
           GitLab: {{ gitlab_status.status }},
-
-
           Maven: {{ "Installed" if maven_status.rc == 0 else "Not Installed" }},
-
-
           SonarQube: {{ sonarqube_status.status }},
-
-
           Docker Registry: {{ docker_registry_status.status }},
-
-
           Kubernetes: {{ "Running" if kubernetes_status.rc == 0 else "Not Running" }}
