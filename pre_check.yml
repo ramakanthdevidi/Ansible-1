@@ -3,8 +3,8 @@
   hosts: localhost
   tasks:
     - name: Check GitLab
-      uri: null
-        url: https://github.com/bhavanaguda
+      uri:
+        url: http://gitlab.example.com
         status_code: 200
       register: gitlab_response
       ignore_errors: yes
@@ -14,13 +14,13 @@
       ignore_errors: yes
     - name: Check SonarQube
       uri:
-        url: http://10.138.77.104:9000
+        url: http://sonarqube.example.com
         status_code: 200
       register: sonarqube_response
       ignore_errors: yes
     - name: Check Docker Registry
       uri:
-        url: https://hub.docker.com/u/bhavanaguda
+        url: http://docker-registry.example.com/v2/
         status_code: 200
       register: docker_registry_response
       ignore_errors: yes
