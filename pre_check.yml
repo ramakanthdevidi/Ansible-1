@@ -4,8 +4,8 @@
   tasks:
     - name: Check GitLab
       uri: null
-      url: https://github.com/bhavanaguda
-      status_code: 200
+        url: https://github.com/bhavanaguda
+        status_code: 200
       register: gitlab_response
       ignore_errors: yes
     - name: Check Maven
