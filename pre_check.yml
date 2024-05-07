@@ -4,7 +4,7 @@
   tasks:
     - name: Check GitLab
       uri:
-        url: http://gitlab.example.com
+        url: https://github.com/bhavanaguda
         status_code: 200
       register: gitlab_response
       ignore_errors: yes
@@ -14,20 +14,20 @@
       ignore_errors: yes
     - name: Check SonarQube
       uri:
-        url: http://sonarqube.example.com
+        url: http://10.138.77.104:9000
         status_code: 200
       register: sonarqube_response
       ignore_errors: yes
     - name: Check Docker Registry
       uri:
-        url: http://docker-registry.example.com/v2/
+        url: https://hub.docker.com/u/bhavanaguda
         status_code: 200
       register: docker_registry_response
       ignore_errors: yes
-    - name: Check Kubernetes
-      shell: kubectl cluster-info --kubeconfig=/home/tcs/kubeconfig
-      register: kubernetes_response
-      ignore_errors: yes
+    - name: Check Kubernetes nodes status
+      shell: kubectl get nodes
+      register: kubernetes_node_status
+      ignore_errors: true
     - name: Display Results
       debug:
         msg: |
