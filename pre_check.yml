@@ -25,7 +25,7 @@
       register: docker_registry_response
       ignore_errors: yes
     - name: Check Kubernetes
-      shell: kubectl cluster-info dump
+      shell: kubectl cluster-info --kubeconfig=/home/tcs/kubeconfig
       register: kubernetes_response
       ignore_errors: yes
     - name: Display Results
