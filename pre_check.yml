@@ -1,45 +1,44 @@
 ---
-- name: CI/CD Pre-Checks
+- name: Pre-Checks for CI/CD Pipeline
   hosts: localhost
   tasks:
-    - name: Check GitLab
+    - name: Check if GitLab is reachable
       uri:
         url: https://github.com/bhavanaguda
         status_code: 200
-      register: gitlab_response
+      register: gitlab_status
+    - name: Check if Maven is installed
+      command: mvn --version
+      register: maven_status
       ignore_errors: yes
-    - name: Check Maven
-      shell: mvn --version
-      register: maven_response
-      ignore_errors: yes
-    - name: Check SonarQube
+    - name: Check if SonarQube is reachable
       uri:
         url: http://10.138.77.104:9000
         status_code: 200
-      register: sonarqube_response
-      ignore_errors: yes
-    - name: Check Docker Registry
+      register: sonarqube_status
+    - name: Check if Docker Registry is reachable
       uri:
         url: https://hub.docker.com/u/bhavanaguda
         status_code: 200
-      register: docker_registry_response
+      register: docker_registry_status
+    - name: Check if Kubernetes is reachable
+      command: kubectl cluster-info
+      register: kubernetes_status
       ignore_errors: yes
-    - name: Check Kubernetes API Server health
-      uri:
-        url: https://10.138.77.104:6443
-        status_code: 200
-        validate_certs: no
-      register: kubernetes_api_health
-      
-    - name: Check Kubernetes node status
-      shell: kubectl get nodes
-      register: kubernetes_node_status
-      ignore_errors: yes
-    - name: Display Results
+    - name: Display pre-checks results
       debug:
-        msg: |
-          GitLab: {{ gitlab_response.status }}
-          Maven: {{ maven_response.rc }}
-          SonarQube: {{ sonarqube_response.status }}
-          Docker Registry: {{ docker_registry_response.status }}
-          Kubernetes: {{ kubernetes_response.rc }}
+        msg: >
+          
+          GitLab: {{ gitlab_status.status }},
+
+
+          Maven: {{ "Installed" if maven_status.rc == 0 else "Not Installed" }},
+
+
+          SonarQube: {{ sonarqube_status.status }},
+
+
+          Docker Registry: {{ docker_registry_status.status }},
+
+
+          Kubernetes: {{ "Running" if kubernetes_status.rc == 0 else "Not Running" }}
