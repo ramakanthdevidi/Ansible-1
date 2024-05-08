@@ -1,54 +1,35 @@
 ---
-- name: CI/CD Pre-Checks
+- name: Pre-Checks for CI/CD Pipeline
   hosts: localhost
   tasks:
-    - block:
-        - name: Check GitLab
-          uri:
-            url: https://github.com/bhavanaguda
-            status_code: 200
-          register: gitlab_response
- 
-        - name: Check Git
-          command: git --version
-          register: git_response
-          ignore_errors: yes
- 
-        - name: Check Maven
-          command: mvn --version
-          register: maven_response
-          ignore_errors: yes
- 
-        - name: Check SonarQube
-          uri:
-            url: http://10.138.77.106:9000
-            status_code: 200
-          register: sonarqube_response
- 
-        - name: Check Docker
-          command: docker --version
-          register: docker_response
-          ignore_errors: yes
- 
-        - name: Check Docker Registry
-          uri:
-            url: https://hub.docker.com/u/bhavanaguda
-            status_code: 200
-          register: docker_registry_response
- 
-        - name: Check Kubernetes
-          shell: kubectl cluster-info
-          register: kubernetes_response
-          ignore_errors: yes
- 
-        - name: Display Results
-          debug:
-            msg: |
-              GitLab: {{ gitlab_response.status }}
-              Git: {{ 'installed' if git_response is defined and 'git' in git_response.stdout else 'not installed' }}
-              Maven: {{ 'installed' if maven_response is defined and 'Apache Maven' in maven_response.stdout else 'not installed' }}
-              SonarQube: {{ sonarqube_response.status }}
-              Docker: {{ 'installed' if docker_response is defined and 'Docker version' in docker_response.stdout else 'not installed' }}
-              Docker Registry: {{ docker_registry_response.status }}
-              Kubernetes: {{ 'installed' if kubernetes_response is defined and 'Kubernetes master' in kubernetes_response.stderr else 'not installed' }}
-
+    - name: Check if GitLab is reachable
+      uri:
+        url: https://github.com/bhavanaguda
+        status_code: 200
+      register: gitlab_status
+    - name: Check if Maven is installed
+      command: mvn --version
+      register: maven_status
+      ignore_errors: yes
+    - name: Check if SonarQube is reachable
+      uri:
+        url: http://10.138.77.106:9000
+        status_code: 200
+      register: sonarqube_status
+    - name: Check if Docker Registry is reachable
+      uri:
+        url: https://hub.docker.com/u/bhavanaguda
+        status_code: 200
+      register: docker_registry_status
+    - name: Check if Kubernetes is reachable
+      command: kubectl --insecure-skip-tls-verify cluster-info dump
+      register: kubernetes_status
+      ignore_errors: yes
+    - name: Display pre-checks results
+      debug:
+        msg: >
+          GitLab: {{ gitlab_status.status }},
+          Maven: {{ "Installed" if maven_status.rc == 0 else "Not Installed" }},
+          SonarQube: {{ sonarqube_status.status }},
+          Docker Registry: {{ docker_registry_status.status }},
+          Kubernetes: {{ "Running" if kubernetes_status.rc == 0 else "Not Running" }}
