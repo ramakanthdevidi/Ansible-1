@@ -1,45 +1,39 @@
 ---
 - name: Pre-Checks for CI/CD Pipeline
- hosts: localhost
- tasks:
-   - name: Check Git availability
-     command: git --version
-     register: git_version
-     ignore_errors: yes
-   - name: Check GitLab availability
-     uri:
-       url: https://github.com/bhavanaguda
-       return_content: yes
-     register: gitlab_check
-     ignore_errors: yes
-     
-   - name: Check Maven availability
-     shell: mvn --version
-     register: maven_check
-     ignore_errors: yes
-     
-   - name: Check SonarQube availability
-     uri:
-       url: http://10.138.77.104:9000
-       return_content: yes
-     register: sonarqube_check
-     ignore_errors: yes
-     
-   - name: Check Docker Registry availability
-     uri:
-       url: https://hub.docker.com/u/bhavanaguda
-       return_content: yes
-     register: docker_registry_check
-     ignore_errors: yes
-     
-   - name: Check Kubernetes availability      
-     shell: kubectl cluster-info
-     register: kubernetes_check
-     ignore_errors: yes
-     
-   # You can add more checks for other services as needed
-   - name: Fail task if any service is unreachable
-     fail:
-       msg: "Service is unreachable."
-     when: gitlab_check.failed or maven_check.failed or sonarqube_check.failed or docker_registry_check.failed or kubernetes_check.failed
-
+  hosts: localhost
+  tasks:
+    - name: Check Git availability
+      command: git --version
+      register: git_version
+      ignore_errors: yes
+    - name: Check GitLab availability
+      uri:
+        url: https://github.com/bhavanaguda
+        return_content: yes
+      register: gitlab_check
+      ignore_errors: yes
+    - name: Check Maven availability
+      shell: mvn --version
+      register: maven_check
+      ignore_errors: yes
+    - name: Check SonarQube availability
+      uri:
+        url: http://10.138.77.104:9000
+        return_content: yes
+      register: sonarqube_check
+      ignore_errors: yes
+    - name: Check Docker Registry availability
+      uri:
+        url: https://hub.docker.com/u/bhavanaguda
+        return_content: yes
+      register: docker_registry_check
+      ignore_errors: yes
+    - name: Check Kubernetes availability
+      shell: kubectl cluster-info
+      register: kubernetes_check
+      ignore_errors: yes
+    - name: Fail task if any service is unreachable
+      fail:
+        msg: Service is unreachable.
+      when: gitlab_check.failed or maven_check.failed or sonarqube_check.failed or
+        docker_registry_check.failed or kubernetes_check.failed
