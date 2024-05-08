@@ -45,11 +45,10 @@
           debug:
             msg: |
               GitLab: {{ gitlab_response.status }}
-              Git: {{ 'installed' if 'git' in git_response.stdout else 'not installed' }}
-              Maven: {{ 'installed' if 'mvn' in maven_response.stdout else 'not installed' }}
+              Git: {{ 'installed' if git_response is defined and 'git' in git_response.stdout else 'not installed' }}
+              Maven: {{ 'installed' if maven_response is defined and 'Apache Maven' in maven_response.stdout else 'not installed' }}
               SonarQube: {{ sonarqube_response.status }}
-              Docker: {{ 'installed' if 'docker' in docker_response.stdout else 'not installed' }}
+              Docker: {{ 'installed' if docker_response is defined and 'Docker version' in docker_response.stdout else 'not installed' }}
               Docker Registry: {{ docker_registry_response.status }}
-              Kubernetes: {{ 'installed' if 'kubectl' in kubernetes_response.stderr else 'not installed' }}
-
+              Kubernetes: {{ 'installed' if kubernetes_response is defined and 'Kubernetes master' in kubernetes_response.stderr else 'not installed' }}
 
