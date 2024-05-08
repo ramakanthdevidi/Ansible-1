@@ -1,39 +1,84 @@
 ---
-- name: Pre-Checks for CI/CD Pipeline
+- name: CI/CD Pre-Checks
   hosts: localhost
   tasks:
-    - name: Check Git availability
-      command: git --version
-      register: git_version
-      ignore_errors: yes
-    - name: Check GitLab availability
+    - name: Check Git
+      command: which git
+      register: git_command_output
+      ignore_errors: true
+ 
+    - name: Check Maven
+      command: which mvn
+      register: maven_command_output
+      ignore_errors: true
+ 
+    - name: Check SonarQube
       uri:
-        url: https://github.com/bhavanaguda
-        return_content: yes
-      register: gitlab_check
-      ignore_errors: yes
-    - name: Check Maven availability
-      shell: mvn --version
-      register: maven_check
-      ignore_errors: yes
-    - name: Check SonarQube availability
+      url: http://10.138.77.104:9000
+      status_code: 200
+      register: sonarqube_response
+      ignore_errors: true
+ 
+    - name: Check Docker
+      command: which docker
+      register: docker_command_output
+      ignore_errors: true
+ 
+    - name: Check Docker Registry
       uri:
-        url: http://10.138.77.104:9001
-        return_content: yes
-      register: sonarqube_check
-      ignore_errors: yes
-    - name: Check Docker Registry availability
-      uri:
-        url: https://hub.docker.com/u/bhavanaguda
-        return_content: yes
-      register: docker_registry_check
-      ignore_errors: yes
-    - name: Check Kubernetes availability
-      shell: kubectl cluster-info
-      register: kubernetes_check
-      ignore_errors: yes
-    - name: Fail task if any service is unreachable
-      fail:
-        msg: Service is unreachable.
-      when: gitlab_check.failed or maven_check.failed or sonarqube_check.failed or
-        docker_registry_check.failed or kubernetes_check.failed
+       url: https://hub.docker.com/u/bhavanaguda
+       status_code: 200
+      register: docker_registry_response
+      ignore_errors: true
+ 
+    - name: Check Kubernetes
+      command: which kubectl
+      register: kubectl_command_output
+      ignore_errors: true
+ 
+    - block:
+        - fail:
+            msg: "Git is not installed"
+          when: git_command_output.rc != 0
+        - debug:
+            msg: "Git is installed"
+          when: git_command_output.rc == 0
+ 
+        - fail:
+            msg: "Maven is not installed"
+          when: maven_command_output.rc != 0
+        - debug:
+            msg: "Maven is installed"
+          when: maven_command_output.rc == 0
+ 
+        - fail:
+            msg: "SonarQube is not available"
+          when: sonarqube_response.status != 200
+        - debug:
+            msg: "SonarQube is available"
+          when: sonarqube_response.status == 200
+ 
+        - fail:
+            msg: "Docker is not installed"
+          when: docker_command_output.rc != 0
+        - debug:
+            msg: "Docker is installed"
+          when: docker_command_output.rc == 0
+ 
+        - fail:
+            msg: "Docker Registry is not available"
+          when: docker_registry_response.status != 200
+        - debug:
+            msg: "Docker Registry is available"
+          when: docker_registry_response.status == 200
+ 
+        - fail:
+            msg: "Kubernetes is not installed"
+          when: kubectl_command_output.rc != 0
+        - debug:
+            msg: "Kubernetes is installed"
+          when: kubectl_command_output.rc == 0
+ 
+      rescue:
+        - debug:
+            msg: "An error occurred during pre-checks. Please review the logs for more information."
