@@ -13,11 +13,13 @@
       register: git_response
       ignore_errors: yes
       failed_when: "'git' not in git_response.stdout"
+      no_log: true
     - name: Check Maven
       shell: mvn --version
       register: maven_response
       ignore_errors: yes
       failed_when: "'mvn' not in maven_response.stdout"
+      no_log: true      
     - name: Check SonarQube
       uri:
         url: http://10.138.77.106:9000
@@ -29,6 +31,7 @@
       register: docker_response
       ignore_errors: yes
       failed_when: "'docker' not in docker_response.stdout"
+      no_log: true
     - name: Check Docker Registry
       uri:
         url: https://hub.docker.com/u/bhavanaguda
@@ -40,6 +43,7 @@
       register: kubernetes_response
       ignore_errors: yes
       failed_when: "'kubectl' not in kubernetes_response.stderr"
+      no_log: true
     - name: Display Results
       debug:
         msg: >
@@ -50,4 +54,4 @@
           Docker: {{ 'installed' if 'docker' in docker_response.stdout else 'not installed' }}
           Docker Registry: {{ docker_registry_response.status }}
           Kubernetes: {{ 'installed' if 'kubectl' in kubernetes_response.stderr else 'not installed' }}
-      ignore_errors: yes
+      
