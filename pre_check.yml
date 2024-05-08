@@ -18,7 +18,7 @@
       ignore_errors: yes
     - name: Check SonarQube availability
       uri:
-        url: http://10.138.77.104:9000
+        url: http://10.138.77.104:9001
         return_content: yes
       register: sonarqube_check
       ignore_errors: yes
