@@ -2,59 +2,52 @@
 - name: CI/CD Pre-Checks
   hosts: localhost
   tasks:
-    - name: Check GitLab
-      uri:
-        url: https://github.com/bhavanaguda
-        status_code: 200
-      register: gitlab_response
-      ignore_errors: yes
+    - block:
+        - name: Check GitLab
+          uri:
+            url: https://github.com/bhavanaguda
+            status_code: 200
+          register: gitlab_response
  
-    - name: Check Git
-      shell: git --version > git_version_check.txt 2>&1
-      args:
-        creates: git_version_check.txt
-      register: git_response
+        - name: Check Git
+          shell: git --version
+          register: git_response
  
-    - name: Check Maven
-      shell: mvn --version > mvn_version_check.txt 2>&1
-      args:
-        creates: mvn_version_check.txt
-      register: maven_response
+        - name: Check Maven
+          shell: mvn --version
+          register: maven_response
  
-    - name: Check SonarQube
-      uri:
-        url: http://10.138.77.106:9000
-        status_code: 200
-      register: sonarqube_response
-      ignore_errors: yes
+        - name: Check SonarQube
+          uri:
+            url: http://10.138.77.106:9000
+            status_code: 200
+          register: sonarqube_response
  
-    - name: Check Docker
-      shell: docker --version > docker_version_check.txt 2>&1
-      args:
-        creates: docker_version_check.txt
-      register: docker_response
+        - name: Check Docker
+          shell: docker --version
+          register: docker_response
  
-    - name: Check Docker Registry
-      uri:
-        url: https://hub.docker.com/u/bhavanaguda
-        status_code: 200
-      register: docker_registry_response
-      ignore_errors: yes
+        - name: Check Docker Registry
+          uri:
+            url: https://hub.docker.com/u/bhavanaguda
+            status_code: 200
+          register: docker_registry_response
  
-    - name: Check Kubernetes
-      shell: kubectl cluster-info > kubectl_check.txt 2>&1
-      args:
-        creates: kubectl_check.txt
-      register: kubernetes_response
+        - name: Check Kubernetes
+          shell: kubectl cluster-info
+          register: kubernetes_response
  
-    - name: Display Results
-      debug:
-        msg: |
-          GitLab: {{ gitlab_response.status }}
-          Git: {{ 'installed' if 'git' in lookup('file', 'git_version_check.txt') else 'not installed' }}
-          Maven: {{ 'installed' if 'Apache Maven' in lookup('file', 'mvn_version_check.txt') else 'not installed' }}
-          SonarQube: {{ sonarqube_response.status }}
-          Docker: {{ 'installed' if 'Docker version' in lookup('file', 'docker_version_check.txt') else 'not installed' }}
-          Docker Registry: {{ docker_registry_response.status }}
-          Kubernetes: {{ 'installed' if 'Kubernetes master' in lookup('file', 'kubectl_check.txt') else 'not installed' }}
+        - name: Display Results
+          debug:
+            msg: |
+              GitLab: {{ gitlab_response.status }}
+              Git: {{ 'installed' if 'git' in git_response.stdout else 'not installed' }}
+              Maven: {{ 'installed' if 'mvn' in maven_response.stdout else 'not installed' }}
+              SonarQube: {{ sonarqube_response.status }}
+              Docker: {{ 'installed' if 'docker' in docker_response.stdout else 'not installed' }}
+              Docker Registry: {{ docker_registry_response.status }}
+              Kubernetes: {{ 'installed' if 'kubectl' in kubernetes_response.stderr else 'not installed' }}
+      rescue:
+        - debug:
+            msg: "An error occurred during pre-checks. Please review the logs for more information."
 
