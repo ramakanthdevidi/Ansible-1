@@ -44,15 +44,10 @@
       debug:
         msg: >
           GitLab: {{ gitlab_response.status }}
-
           Git: {{ 'installed' if 'git' in git_response.stdout else 'not installed' }}
-
           Maven: {{ 'installed' if 'mvn' in maven_response.stdout else 'not installed' }}
-
           SonarQube: {{ sonarqube_response.status }}
-
           Docker: {{ 'installed' if 'docker' in docker_response.stdout else 'not installed' }}
-
           Docker Registry: {{ docker_registry_response.status }}
-
           Kubernetes: {{ 'installed' if 'kubectl' in kubernetes_response.stderr else 'not installed' }}
+      ignore_errors: yes
