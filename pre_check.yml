@@ -1,35 +1,58 @@
 ---
-- name: Pre-Checks for CI/CD Pipeline
+- name: CI/CD Pre-Checks
   hosts: localhost
   tasks:
-    - name: Check if GitLab is reachable
+    - name: Check GitLab
       uri:
         url: https://github.com/bhavanaguda
         status_code: 200
-      register: gitlab_status
-    - name: Check if Maven is installed
-      command: mvn --version
-      register: maven_status
+      register: gitlab_response
       ignore_errors: yes
-    - name: Check if SonarQube is reachable
+    - name: Check Git
+      shell: git --version
+      register: git_response
+      ignore_errors: yes
+      failed_when: "'git' not in git_response.stdout"
+    - name: Check Maven
+      shell: mvn --version
+      register: maven_response
+      ignore_errors: yes
+      failed_when: "'mvn' not in maven_response.stdout"
+    - name: Check SonarQube
       uri:
         url: http://10.138.77.106:9000
         status_code: 200
-      register: sonarqube_status
-    - name: Check if Docker Registry is reachable
+      register: sonarqube_response
+      ignore_errors: yes
+    - name: Check Docker
+      shell: docker --version
+      register: docker_response
+      ignore_errors: yes
+      failed_when: "'docker' not in docker_response.stdout"
+    - name: Check Docker Registry
       uri:
         url: https://hub.docker.com/u/bhavanaguda
         status_code: 200
-      register: docker_registry_status
-    - name: Check if Kubernetes is reachable
-      command: kubectl --insecure-skip-tls-verify cluster-info dump
-      register: kubernetes_status
+      register: docker_registry_response
       ignore_errors: yes
-    - name: Display pre-checks results
+    - name: Check Kubernetes
+      shell: kubectl cluster-info
+      register: kubernetes_response
+      ignore_errors: yes
+      failed_when: "'kubectl' not in kubernetes_response.stderr"
+    - name: Display Results
       debug:
         msg: >
-          GitLab: {{ gitlab_status.status }},
-          Maven: {{ "Installed" if maven_status.rc == 0 else "Not Installed" }},
-          SonarQube: {{ sonarqube_status.status }},
-          Docker Registry: {{ docker_registry_status.status }},
-          Kubernetes: {{ "Running" if kubernetes_status.rc == 0 else "Not Running" }}
+          GitLab: {{ gitlab_response.status }}
+
+          Git: {{ 'installed' if 'git' in git_response.stdout else 'not installed' }}
+
+          Maven: {{ 'installed' if 'mvn' in maven_response.stdout else 'not installed' }}
+
+          SonarQube: {{ sonarqube_response.status }}
+
+          Docker: {{ 'installed' if 'docker' in docker_response.stdout else 'not installed' }}
+
+          Docker Registry: {{ docker_registry_response.status }}
+
+          Kubernetes: {{ 'installed' if 'kubectl' in kubernetes_response.stderr else 'not installed' }}
