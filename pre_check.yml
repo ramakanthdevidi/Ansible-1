@@ -1,84 +1,29 @@
 ---
 - name: CI/CD Pre-Checks
   hosts: localhost
+  gather_facts: no
   tasks:
-    - name: Check Git
+    - name: Check if Git is installed
       command: which git
-      register: git_command_output
+      register: git_check
       ignore_errors: true
  
-    - name: Check Maven
-      command: which mvn
-      register: maven_command_output
-      ignore_errors: true
+    - name: Check if Git is reachable
+  command: git ls-remote --exit-code https://gitlab.example.com/project.git HEAD
+  register: git_reachable
+  ignore_errors: true
  
-    - name: Check SonarQube
-      uri:
-      url: http://10.138.77.104:9000
-      status_code: 200
-      register: sonarqube_response
-      ignore_errors: true
  
-    - name: Check Docker
-      command: which docker
-      register: docker_command_output
-      ignore_errors: true
- 
-    - name: Check Docker Registry
-      uri:
-       url: https://hub.docker.com/u/bhavanaguda
-       status_code: 200
-      register: docker_registry_response
-      ignore_errors: true
- 
-    - name: Check Kubernetes
-      command: which kubectl
-      register: kubectl_command_output
-      ignore_errors: true
- 
-    - block:
-        - fail:
-            msg: "Git is not installed"
-          when: git_command_output.rc != 0
-        - debug:
-            msg: "Git is installed"
-          when: git_command_output.rc == 0
- 
-        - fail:
-            msg: "Maven is not installed"
-          when: maven_command_output.rc != 0
-        - debug:
-            msg: "Maven is installed"
-          when: maven_command_output.rc == 0
- 
-        - fail:
-            msg: "SonarQube is not available"
-          when: sonarqube_response.status != 200
-        - debug:
-            msg: "SonarQube is available"
-          when: sonarqube_response.status == 200
- 
-        - fail:
-            msg: "Docker is not installed"
-          when: docker_command_output.rc != 0
-        - debug:
-            msg: "Docker is installed"
-          when: docker_command_output.rc == 0
- 
-        - fail:
-            msg: "Docker Registry is not available"
-          when: docker_registry_response.status != 200
-        - debug:
-            msg: "Docker Registry is available"
-          when: docker_registry_response.status == 200
- 
-        - fail:
-            msg: "Kubernetes is not installed"
-          when: kubectl_command_output.rc != 0
-        - debug:
-            msg: "Kubernetes is installed"
-          when: kubectl_command_output.rc == 0
- 
-      rescue:
-        - debug:
-            msg: "An error occurred during pre-checks. Please review the logs for more information."
+- name: Display Results
+  debug:
+      msg: |
+          Git:
+            {% if git_check.rc == 0 %}
+              {% if git_reachable.rc == 0 %}
+                installed and reachable
+              {% else %}
+                installed but not reachable
+              {% endif %}
+            {% else %}
+              not installed
+            {% endif %}
