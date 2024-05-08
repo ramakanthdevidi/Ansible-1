@@ -10,12 +10,14 @@
           register: gitlab_response
  
         - name: Check Git
-          shell: git --version
+          command: git --version
           register: git_response
+          ignore_errors: yes
  
         - name: Check Maven
-          shell: mvn --version
+          command: mvn --version
           register: maven_response
+          ignore_errors: yes
  
         - name: Check SonarQube
           uri:
@@ -24,8 +26,9 @@
           register: sonarqube_response
  
         - name: Check Docker
-          shell: docker --version
+          command: docker --version
           register: docker_response
+          ignore_errors: yes
  
         - name: Check Docker Registry
           uri:
@@ -36,6 +39,7 @@
         - name: Check Kubernetes
           shell: kubectl cluster-info
           register: kubernetes_response
+          ignore_errors: yes
  
         - name: Display Results
           debug:
@@ -47,7 +51,5 @@
               Docker: {{ 'installed' if 'docker' in docker_response.stdout else 'not installed' }}
               Docker Registry: {{ docker_registry_response.status }}
               Kubernetes: {{ 'installed' if 'kubectl' in kubernetes_response.stderr else 'not installed' }}
-      rescue:
-        - debug:
-            msg: "An error occurred during pre-checks. Please review the logs for more information."
+
 
