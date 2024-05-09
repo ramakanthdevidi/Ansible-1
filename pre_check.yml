@@ -1,8 +1,8 @@
 ---
 - name: Pre-Checks for CI/CD Pipeline
- hosts: localhost
- gather_facts: no
- tasks:
+  hosts: localhost
+  gather_facts: no
+  tasks:
    - name: Check if Git is installed
      command: "git --version"
      register: git_installed
