@@ -4,49 +4,37 @@
   gather_facts: no
   tasks:
    - name: Check if Git is installed
-     command: "git --version"
+     shell: git --version
      register: git_installed
      ignore_errors: yes
-   - name: Install Git (if not installed)
-     become: yes
-     package:
-       name: git
-       state: present
-     when: git_installed.rc != 0
-   - name: Check if GitLab is reachable
-     uri:
-       url: "https://github.com/bhavanaguda"
-       method: GET
-     register: gitlab_status
-     ignore_errors: yes
+ 
    - name: Check if Maven is installed
-     command: "mvn --version"
+     shell: mvn --version
      register: maven_version
      ignore_errors: yes
+ 
    - name: Check if SonarQube is reachable
      uri:
        url: http://10.138.77.104:9000
-       method: GET
      register: sonarqube_status
      ignore_errors: yes
+ 
    - name: Check if Docker Registry is reachable
      uri:
-       url: "https://hub.docker.com/u/bhavanaguda"
-       method: GET
+       url: https://hub.docker.com/u/bhavanaguda
      register: docker_registry_status
      ignore_errors: yes
-   - name: Check if Kubernetes is reachable
-     uri:
-       url: "http://your_kubernetes_api"
-       method: GET
-     register: kubernetes_status
+ 
+   - name: Check if Kubernetes is installed
+     shell: kubectl version --client
+     register: kubernetes_installed
      ignore_errors: yes
+ 
    - name: Display pre-checks status
      debug:
        msg: |
-         Git: Installed: {{ git_installed.rc == 0 }}
-         GitLab: {{ gitlab_status.status }}
-         Maven: {{ maven_version.rc == 0 }}
-         SonarQube: {{ sonarqube_status.status }}
-         Docker Registry: {{ docker_registry_status.status }}
-         Kubernetes: {{ kubernetes_status.status }}
+         Git: Installed: {{ 'Installed' if git_installed.rc == 0 else 'Not Installed' }}
+         Maven: Installed: {{'Installed' if maven_version.rc == 0 else 'Not Installed' }}
+         SonarQube: Reachable: {{'Reachable' if sonarqube_status.status == 200 else 'Not Reachable'}}
+         Docker Registry: {{'Installed' if docker_registry_status.status == 200 else 'Not Installed' }}
+         Kubernetes: {{'Installed' if kubernetes_installed.rc == 0 else 'Not Installed'}}
